@@ -4,7 +4,7 @@ This programming project implements a BARES(Basic ARithmetic Expression Evaluato
 
 * Integer numeric constants (-32.768 to 32.767);
 * Operators (+, , /, ⇤,ˆ, %), with precedence; and
-• Parentheses.
+* Parentheses.
 
 # Operations, scope, and precedence
 
