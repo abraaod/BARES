@@ -10,6 +10,7 @@
 #include <algorithm>// std::copy, para copiar substrings.
 
 #include "token.h"  // struct Token.
+#include "reader.h"
 
 /*!
  * Implements a recursive descendent parser for a EBNF grammar.

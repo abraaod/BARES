@@ -9,47 +9,7 @@
 
 #include "../include/parser.h"
 
-std::vector<std::string> expressions =
-{
-    /*"(10) + (2+3)",
-    /*"    12    +    4   8",
-    "32767 - 32768 + 3",
-    "5 + -32766",
-    "5 + -32769",
-    "12 + 3",
-    "-3+-5+-6",
-    "12 + 3     -3 + -34 ",
-    "+12",
-    "1.3 * 4",
-    "a + 4",
-    "       ",
-    "  123 +  548"*/
-    "10000000 - 2",
-"2+",
-"3 * d",
-"2 = 3",
-"2.3 + 4",
-"2 * 3 4",
-"2 ** 3",
-"%5 * 10",
-"*5 * 10",
-"(2+3)*/(1-4)",
-"(-3*4)(10*5)",
-"2 - 4)",
-"2) - 4",
-")2 - 4",
-"((2%3) * 8",
-"3/(1-1)",
-"10/(3*3^2)",
-"20*20000",
-"25 / 5 + 4 * 8",
-"(2+3) * 8",
-"5 % 2 ^4",
-"(5 % 3) ^4",
-"-3"
-
-
-};
+std::vector<std::string> expressions;
 
 void print_error_msg( const Parser::ResultType & result, std::string str )
 {
@@ -158,14 +118,6 @@ bool has_higher_or_eq_precedence( symbol op1 , symbol op2 )
     return ( get_precedence(op1) >= get_precedence(op2) ) ?
         is_right_association( op1 ) ? false : true  :
         false;
-
-    /*
-    if ( get_precedence(op1) >= get_precedence(op2) )
-    {
-        return is_right_association( op1 ) ? false : true ;
-    }
-    return false;
-    */
 }
 
 /// Execute the binary operator on two operands and return the result.
@@ -291,9 +243,12 @@ value_type evaluate_postfix( std::vector<std::string> postfix )
 }
 
 
-int main()
+int main(int argc,char *argv[])
 {
     Parser my_parser; // Instancia um parser.
+
+    expressions = reader_file(argv[1]);
+
     // Tentar analisar cada expressão da lista.
     for( const auto & expr : expressions )
     {

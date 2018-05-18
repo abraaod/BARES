@@ -56,11 +56,25 @@ And _rejects_ expressions like:
 
 Later on we might want to improve this grammar to accept other binary operations and more robust expressions.
 
+# How to run
+
+If you using a linux based system, only type make at your project folder to generate the executable file.
+
+The code was organized in several folders, such as:
+
+
+* src (for .cpp files),
+* data (for input files),
+* include (for header files), and
+* bin (for .o and executable files)
+
+Once your executable file is generated, you can execute this by:
+
+./bares input file
+
 
 # Authorship
 
 Program developed by Abraão Dantas (<abraaovld@gmail.com>) at EDB1 classes, 2018.1
 
 &copy; IMD/UFRN 2017-2018.
-
-

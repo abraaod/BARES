@@ -10,7 +10,7 @@ BUILD_PATH = build
 BIN_PATH = $(BUILD_PATH)/bin
 
 # executable #
-BIN_NAME = parser
+BIN_NAME = bares
 
 # extensions #
 SRC_EXT = cpp
