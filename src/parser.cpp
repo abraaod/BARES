@@ -7,8 +7,8 @@ Parser::terminal_symbol_t  Parser::lexer( char c_ ) const
 {
     switch( c_ )
     {
+        case '-': return terminal_symbol_t::TS_MINUS;
         case '+':
-        case '-':
         case '^':
         case '*':
         case '%':
@@ -114,14 +114,21 @@ Parser::ResultType Parser::expression()
 {
     //ResultType result;
     // TODO: implementar esta função.
+
     auto result = term();
     if(result.type == ResultType::OK){
       skip_ws();
       auto begin_token(it_curr_symb);
-      if(is_operator()){
+      if(is_operator() or is_minus()){
         std::string token_str;
         std::copy( begin_token, it_curr_symb, std::back_inserter( token_str ) );
         token_list.emplace_back( Token( token_str, Token::token_t::OPERATOR) );
+        if( end_input()){
+          return ResultType(ResultType::MISSING_TERM, std::distance(expr.begin(), it_curr_symb));
+        }
+        if( is_operator()){
+          return ResultType(ResultType::ILL_FORMED_INTEGER, std::distance(expr.begin(), it_curr_symb));
+        }
         expression();
       }
     }
@@ -145,47 +152,54 @@ Parser::ResultType Parser::term()
     skip_ws();
     // Guarda o início do termo no input, para possíveis mensagens de erro.
     auto begin_token( it_curr_symb );
-    // Processe um inteiro.
-    auto result =  integer();
-    // Vamos tokenizar o inteiro, se ele for bem formado.
-    if ( result.type == ResultType::OK )
-    {
-        // Copiar a substring correspondente para uma variável string.
-        std::string token_str;
-        std::copy( begin_token, it_curr_symb, std::back_inserter( token_str ) );
-        // Tentar realizar a conversão de string para inteiro (usar stoll()).
-        input_int_type token_int;
-        try { token_int = stoll( token_str ); }
-        catch( const std::invalid_argument & e )
-        {
-            return ResultType( ResultType::ILL_FORMED_INTEGER,
-                               std::distance( expr.begin(), begin_token ) );
-        }
+    ResultType result;
+    if(is_op_scope()){
+      std::string token_str;
+      std::copy( begin_token, it_curr_symb, std::back_inserter( token_str ) );
+      token_list.emplace_back( Token( token_str, Token::token_t::OP_SCOPE) );
+      expression();
+      auto next_token (it_curr_symb);
+      if(is_cl_scope()){
+        std::string token_str_scope;
+        std::copy( next_token, it_curr_symb, std::back_inserter( token_str_scope ) );
+        token_list.emplace_back( Token( token_str_scope, Token::token_t::CL_SCOPE) );
+      }else{
+        return ResultType(ResultType::MISSING_CLOSING, std::distance(expr.begin(), it_curr_symb));
+      }
+    }else if(is_operator()){
+      return ResultType(ResultType::ILL_FORMED_INTEGER, std::distance(expr.begin(), it_curr_symb));
+    }
+    else{
+      auto begin_token( it_curr_symb );
+      auto result =  integer();
+      // Vamos tokenizar o inteiro, se ele for bem formado.
+      if ( result.type == ResultType::OK )
+      {
+          // Copiar a substring correspondente para uma variável string.
+          std::string token_str;
+          std::copy( begin_token, it_curr_symb, std::back_inserter( token_str ) );
+          // Tentar realizar a conversão de string para inteiro (usar stoll()).
+          input_int_type token_int;
+          try { token_int = stoll( token_str ); }
+          catch( const std::invalid_argument & e )
+          {
+              return ResultType( ResultType::ILL_FORMED_INTEGER,
+                                 std::distance( expr.begin(), begin_token ) );
+          }
 
-        // Recebemos um inteiro válido, resta saber se está dentro da faixa.
-        if ( token_int < std::numeric_limits< required_int_type >::min() or
-                token_int > std::numeric_limits< required_int_type >::max() )
-        {
-            // Fora da faixa, reportar erro.
-            return ResultType( ResultType::INTEGER_OUT_OF_RANGE,
-                               std::distance( expr.begin(), begin_token ) );
-        }
-        // Coloca o novo token na nossa lista de tokens.
-        token_list.emplace_back( Token( token_str, Token::token_t::OPERAND ) );
-    }else{
-      if(is_op_scope()){
-        std::string token_str;
-        std::copy( begin_token, it_curr_symb, std::back_inserter( token_str ) );
-        token_list.emplace_back( Token( token_str, Token::token_t::OP_SCOPE) );
-        expression();
-        auto next_token (it_curr_symb);
-        if(is_cl_scope()){
-          std::string token_str_scope;
-          std::copy( next_token, it_curr_symb, std::back_inserter( token_str_scope ) );
-          token_list.emplace_back( Token( token_str_scope, Token::token_t::CL_SCOPE) );
-        }
+          // Recebemos um inteiro válido, resta saber se está dentro da faixa.
+          if ( token_int < std::numeric_limits< required_int_type >::min() or
+                  token_int > std::numeric_limits< required_int_type >::max() )
+          {
+              // Fora da faixa, reportar erro.
+              return ResultType( ResultType::INTEGER_OUT_OF_RANGE,
+                                 std::distance( expr.begin(), begin_token ) );
+          }
+          // Coloca o novo token na nossa lista de tokens.
+          token_list.emplace_back( Token( token_str, Token::token_t::OPERAND ) );
       }
     }
+
     return result;
 }
 
@@ -276,6 +290,11 @@ bool Parser::is_operator(){
   return( accept(terminal_symbol_t::TS_OPERATOR)) ? true : false;
 }
 
+bool Parser::is_minus(){
+
+  return( accept(terminal_symbol_t::TS_MINUS)) ? true : false;
+}
+
 bool Parser::is_op_scope(){
 
   return ( accept(terminal_symbol_t::TS_OP_SCOPE)) ? true : false;
@@ -325,7 +344,7 @@ Parser::ResultType  Parser::parse( std::string e_ )
             skip_ws(); // Vamos "consumir" os espaços em branco, se existirem....
             if ( not end_input() ) // Se estiver tudo ok, deveríamos estar no final da string.
             {
-                return ResultType( ResultType::EXTRANEOUS_SYMBOL, std::distance( expr.begin(), it_curr_symb ) );
+                return ResultType( ResultType::EXTRANEOUS_SYMBOL, std::distance( expr.begin(), it_curr_symb) );
             }
         }
     }

@@ -42,7 +42,8 @@ class Parser
                     ILL_FORMED_INTEGER,
                     MISSING_TERM,
                     EXTRANEOUS_SYMBOL,
-                    INTEGER_OUT_OF_RANGE
+                    INTEGER_OUT_OF_RANGE,
+                    MISSING_CLOSING
             };
 
             //=== Members (public).
@@ -79,12 +80,8 @@ class Parser
     private:
         // Terminal symbols table
         enum class terminal_symbol_t{  // The symbols:-
-            TS_PLUS,	        //!< code for "+"
+
             TS_MINUS,	        //!< code for "-"
-            TS_POT,           //!< code for "^"
-            TS_TIMES,         //!< code for "*"
-            TS_REST,         //!< code for "%"
-            TS_DIV,         //!< code for "/"
             TS_OP_SCOPE,         //!< code for "("
             TS_CL_SCOPE,         //!< code for ")"
             TS_OPERATOR,
@@ -122,6 +119,7 @@ class Parser
         bool is_operator();
         bool is_op_scope();
         bool is_cl_scope();
+        bool is_minus();
 };
 
 #endif
