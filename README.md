@@ -1,9 +1,27 @@
 # Introduction
 
-This programming project implements a simple parser for an EBNF (_Extended Backus-Naur Form_) grammar.
+This programming project implements a BARES(Basic ARithmetic Expression Evaluator based on Stacks) program. Which is capable of receive simple arithmetics expresssions, formed by:
 
-The first objective is to provide a basic example of EBNF grammar and a parser, so that students may understand the concept.
-The second objective is to reuse this code to do the parsing stage in the [BARES programming project](http://projetos.imd.ufrn.br/LP1_20162/bares.git).
+* Integer numeric constants (-32.768 to 32.767);
+* Operators (+, , /, ⇤,ˆ, %), with precedence; and
+• Parentheses.
+
+# Operations, scope, and precedence
+
+The supported operations and scope delimiters are:
+
+- `^`: power, right association, weight=3.
+- `*`: multiplication, left association, weight=2.
+- `/`: division, left association, weight=2.
+- `%`: module, left association, weight=2.
+- `+`: addition, left association, weight=1.
+- `-`: subtraction, left association, wight=1.
+- `(`: opening scope, weight=0.
+- `)`: closing scope, weight=n/a.
+
+#EBNF grammar
+
+For support the BARES was implemented  a parser for an EBNF (_Extended Backus-Naur Form_) grammar.
 
 Information on **EBNF grammar** may be found [here](https://en.wikipedia.org/wiki/Extended_Backus–Naur_Form).
 
@@ -31,27 +49,18 @@ This grammar _accepts_ expressions like:
 And _rejects_ expressions like:
 
 * "01 + 3"
-* " - 3 + 4"
 * "2 +"
 * "  "
 * "+2 + 5"
 * "-02 + 4"
-* "(2+3)" _(for the time being)_
 
-Later on we might want to improve this grammar to accept other binary operations and _parenthesis_.
+Later on we might want to improve this grammar to accept other binary operations and more robust expressions.
 
-# TODO
-
-- [ ] Explain the concepts behind the parsing process.
-- [ ] Implement `Parser` class and its basic infrastructure for processing symbols.
-- [ ] Implement the non-terminal production rules.
-- [ ] Test the parsing process.
-- [ ] Implement token extraction.
-- [ ] Expand the grammar to handle a full [BARES](http://projetos.imd.ufrn.br/LP1_20162/bares.git) expression.
 
 # Authorship
 
-Program developed by Selan (<selan@dimap.ufrn.br>) and students from EDB1, 2017.2
+Program developed by Abraão Dantas (<abraaovld@gmail.com>) at EDB1 classes, 2018.1
 
-&copy; DIMAp/UFRN 2016-2017.
+&copy; IMD/UFRN 2017-2018.
+
 
