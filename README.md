@@ -19,7 +19,7 @@ The supported operations and scope delimiters are:
 - `(`: opening scope, weight=0.
 - `)`: closing scope, weight=n/a.
 
-#EBNF grammar
+# EBNF grammar
 
 For support the BARES was implemented  a parser for an EBNF (_Extended Backus-Naur Form_) grammar.
 
