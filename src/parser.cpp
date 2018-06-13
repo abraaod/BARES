@@ -31,8 +31,7 @@ Parser::terminal_symbol_t  Parser::lexer( char c_ ) const
     }
     return terminal_symbol_t::TS_INVALID;
 }
-
-
+Parser::ResultType saida;
 /// Consumes a valid character from the input source expression.
 void Parser::next_symbol( void )
 {
@@ -129,10 +128,16 @@ Parser::ResultType Parser::expression()
         if( is_operator()){
           return ResultType(ResultType::ILL_FORMED_INTEGER, std::distance(expr.begin(), it_curr_symb));
         }
-        expression();
+        result = expression();
       }
     }
 
+    if(result.type != 0 ){
+      saida = result;
+    }
+    if(saida.type == 0){
+        return saida;
+    }
     return result;
 }
 
@@ -157,7 +162,7 @@ Parser::ResultType Parser::term()
       std::string token_str;
       std::copy( begin_token, it_curr_symb, std::back_inserter( token_str ) );
       token_list.emplace_back( Token( token_str, Token::token_t::OP_SCOPE) );
-      expression();
+      result = expression();
       auto next_token (it_curr_symb);
       if(is_cl_scope()){
         std::string token_str_scope;
@@ -180,6 +185,7 @@ Parser::ResultType Parser::term()
           std::copy( begin_token, it_curr_symb, std::back_inserter( token_str ) );
           // Tentar realizar a conversão de string para inteiro (usar stoll()).
           input_int_type token_int;
+          // std::cout << token_str << " parser"<< std::endl;
           try { token_int = stoll( token_str ); }
           catch( const std::invalid_argument & e )
           {
@@ -335,7 +341,6 @@ Parser::ResultType  Parser::parse( std::string e_ )
     {
         // chamada regular para expressão.
         result = expression();
-
         // Verificar se ainda sobrou algo na expressão.
         if ( result.type == ResultType::OK )
         {

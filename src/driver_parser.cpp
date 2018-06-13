@@ -1,5 +1,6 @@
 #include <iostream>
 #include <iomanip>
+#include <iterator>
 #include <vector>
 #include <stack>     // stack
 #include <string>    // string
@@ -56,7 +57,7 @@ bool control = true;
 // Simple helper functions that identify the incoming symbol.
 
 bool is_operator( symbol s )
-{ return std::string("^*%/+-").find( s ) != std::string::npos; }
+{ return (s>='%' and s<='/') or (s=='^');}
 
 bool is_operand( symbol s )
 { return s>='0' and s<='9'; }
@@ -208,22 +209,39 @@ std::vector<std::string> infix_to_postfix( Parser & obj )
 value_type evaluate_postfix( std::vector<std::string> postfix )
 {
     std::stack< value_type > s;
-    int c_operand = 0, c_operator = 0;
-
+  /*  int c_operator_minus=0, c_operator = 0;
     for( auto si = postfix.begin(); si != postfix.end(); si++ )
     {
-      if ( is_operand( (*si)[0] ) )
-          c_operand++;
-      else if ( is_operator( (*si)[0] ) )
-      {
-        c_operator++;
+      std::string teste = (*si)+"";
+      std::cout << teste <<" "<< teste.size()<< std::endl;
+      if(teste.size() == 1){
+        if ( (*si)[0] = '-' ){
+            c_operator_minus++;
+        }
+        else{
+          c_operator++;
+        }
       }
-    }
-
+    }*/
     // For each operator/operando in the input postfix expression do this...
     for( auto si = postfix.begin(); si != postfix.end(); si++ )
     {
-        if ( is_operand( (*si)[0] ) ){
+        std::string teste = (*si)+"";
+        std::cout << teste << "\n";
+        if(teste.size() == 1){
+          if(is_operator((*si)[0])){
+            // IMPORTANT: Pop out operandos in reverse order!
+            auto op2 = s.top(); s.pop();
+            auto op1 = s.top(); s.pop();
+            // The result of the operation is pushed back into the stack.
+            s.push( execute_operator( op1, op2, (*si)[0] ) );
+          }else{
+              s.push( char2integer(*si) );
+          }
+        }else{
+          s.push( char2integer(*si) );
+        }
+        /*if ( is_operand( (*si)[0] ) ){
 
             s.push( char2integer(*si) ); // Do not forget to convert it into integer.
 
@@ -238,7 +256,8 @@ value_type evaluate_postfix( std::vector<std::string> postfix )
 
         }
         //else assert( false ); // unexpected symbol...
-    }
+    }*/
+  }
     return s.top();
 }
 
@@ -265,12 +284,17 @@ int main(int argc,char *argv[])
           std::cout << ">>> Expression SUCCESSFULLY parsed!\n";
 
           auto postfix = infix_to_postfix(my_parser);
-
+          //std::copy(postfix.begin(), postfix.end(), std::ostream_iterator<std::string>(std::cout, "\n"));
           auto result = evaluate_postfix( postfix );
-          if(control){
-            std::cout << ">>> Result is: " << result << std::endl;
+          if(result > std::numeric_limits< int >::min() and result < std::numeric_limits< int >::max()){
+            if(control){
+              std::cout << ">>> Result is: " << result << std::endl;
+            }else{
+              std::cout << "Division by zero!" << std::endl;
+              control = true;
+            }
           }else{
-            std::cout << "Division by zero!" << std::endl;
+            std::cout << "Numeric overflow!" << std::endl;
             control = true;
           }
 
